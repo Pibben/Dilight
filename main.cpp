@@ -11,6 +11,8 @@
 
 #include <FastLED.h>
 
+#include <lib433mhz.h>
+
 #define NUM_LEDS 300
 
 static void blankFastLED(CRGBArray<NUM_LEDS>& leds) {
@@ -66,11 +68,13 @@ class Disco : public Scene {
     }
 };
 
-void warmWhite() {
+void warmWhite(CRGBArray<NUM_LEDS>& leds) {
+	leds.fill_solid(CRGB::White);
+	FastLED.show();
 }
 
 bool getRemotePulse() {
-    return false;
+    return receive433MHz(0x00899381, 3);
 }
 
 class Scheduler {
@@ -124,7 +128,7 @@ int main() {
 
     blankFastLED(leds);
 
-    warmWhite();
+    warmWhite(leds);
 
     Scheduler scheduler;
 
@@ -141,11 +145,11 @@ int main() {
     scheduler.add(&rb);
 
     for(;;) {
-#if 0
+#if 1
         if(getRemotePulse()) {
             if(discoMode) {
                 scheduler.stop();
-                warmWhite();
+                warmWhite(leds);
             } else {
                 scheduler.start();
             }
