@@ -50,26 +50,90 @@ class Rainbow : public Scene {
     }
 };
 
+static const CRGB DiscoColors[] = {
+        CRGB::Red,
+        CRGB::Blue,
+        CRGB::Green,
+        CRGB::Purple,
+        CRGB::Yellow,
+        CRGB::Turquoise,
+        CRGB::Pink
+};
+
+static const uint8_t numDiscoColors = 7;
+
 class Disco : public Scene {
     virtual bool run(uint16_t time, CRGBArray<NUM_LEDS>& leds) {
         if((time % 50) == 0) {
-            static const CRGB DiscoColors[] = { CRGB::Red,
-                    CRGB::Blue,
-                    CRGB::Green,
-                    CRGB::Purple,
-                    CRGB::Yellow,
-                    CRGB::Turquoise,
-                    CRGB::Pink };
             const int sets = 12;
             for(int i = 0; i < sets; ++i) {
                 const int num = NUM_LEDS / sets;
-                leds(i * num, (i + 1) * num - 1).fill_solid(DiscoColors[random8(7)]);
+                leds(i * num, (i + 1) * num - 1).fill_solid(DiscoColors[random8(numDiscoColors)]);
             }
         }
 
         FastLED.show(40);
 
         return time < 400;
+    }
+};
+
+class Fader : public Scene {
+private:
+    struct State {
+        CRGB color;
+        uint8_t level;
+        int8_t dir;
+    };
+
+    State states[2];
+
+    uint8_t count;
+
+    static bool fade(State& state, CPixelView<CRGB> leds) {
+        static int scale = 5;
+
+        bool retval = false;
+
+        leds.fill_solid(state.color).fadeLightBy(state.level);
+
+        state.level += state.dir*scale;
+        if(state.level == 0 && state.dir == -1) {
+            state.dir = 1;
+        } else if(state.level == 255 && state.dir == 1) {
+            state.color = DiscoColors[random8(numDiscoColors)];
+            state.dir = -1;
+            retval = true;
+        }
+
+        return retval;
+    }
+public:
+    Fader() : count(0) {
+        states[0].color = DiscoColors[random8(numDiscoColors)];
+        states[0].level = 0;
+        states[0].dir = 1;
+
+        states[1].color = DiscoColors[random8(numDiscoColors)];
+        states[1].level = 255;
+        states[1].dir = -1;
+    }
+
+    virtual bool run(uint16_t time, CRGBArray<NUM_LEDS>& leds) {
+
+        if(fade(states[0], leds(0, NUM_LEDS / 2 - 1))) {
+            count++;
+        }
+        fade(states[1], leds(NUM_LEDS / 2, NUM_LEDS - 1));
+
+        FastLED.show(40);
+
+        if(count == 4) {
+            count = 0;
+            return false;
+        } else {
+            return true;
+        }
     }
 };
 
@@ -143,6 +207,7 @@ int main() {
     ConstantColor purple(CRGB::Purple);
     Rainbow rb;
     Disco d;
+    Fader f;
 
     scheduler.add(&blue);
     scheduler.add(&green);
@@ -150,6 +215,7 @@ int main() {
     scheduler.add(&purple);
     scheduler.add(&rb);
     scheduler.add(&d);
+    scheduler.add(&f);
 
     for(;;) {
 #if 1
