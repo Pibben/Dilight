@@ -15,6 +15,8 @@
 
 #define NUM_LEDS 300
 
+static const uint8_t globalIntensity = 40;
+
 static void blankFastLED(CRGBArray<NUM_LEDS>& leds) {
     fill_solid(leds, 300, CRGB::Black);
     FastLED.show();
@@ -35,7 +37,7 @@ public:
 
     virtual bool run(uint16_t time, CRGBArray<NUM_LEDS>& leds) {
         leds.fill_solid(mColor);
-        FastLED.show(40);
+        FastLED.show(globalIntensity);
         return time < 400;
     }
 
@@ -45,7 +47,7 @@ public:
 class Rainbow : public Scene {
     virtual bool run(uint16_t time, CRGBArray<NUM_LEDS>& leds) {
         leds.fill_rainbow(millis() / 10, 2);
-        FastLED.show(40);
+        FastLED.show(globalIntensity);
         return time < 400;
     }
 };
@@ -72,7 +74,7 @@ class Disco : public Scene {
             }
         }
 
-        FastLED.show(40);
+        FastLED.show(globalIntensity);
 
         return time < 400;
     }
@@ -126,7 +128,7 @@ public:
         }
         fade(states[1], leds(NUM_LEDS / 2, NUM_LEDS - 1));
 
-        FastLED.show(40);
+        FastLED.show(globalIntensity);
 
         if(count == 4) {
             count = 0;
@@ -139,7 +141,7 @@ public:
 
 void warmWhite(CRGBArray<NUM_LEDS>& leds) {
     leds.fill_solid(CRGB::White);
-    FastLED.show();
+    FastLED.show(globalIntensity);
 }
 
 bool getRemotePulse() {
