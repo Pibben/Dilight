@@ -145,7 +145,14 @@ void warmWhite(CRGBArray<NUM_LEDS>& leds) {
 }
 
 bool getRemotePulse() {
-    return receive433MHz(0x00899381, 3);
+    static uint8_t debounce = 0;
+    if(receive433MHz(0x00899381, 3) && debounce == 0) {
+        debounce = 5;
+        return true;
+    } else {
+        debounce = debounce == 0 ? 0 : debounce - 1;
+        return false;
+    }
 }
 
 class Scheduler {
