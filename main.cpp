@@ -52,19 +52,26 @@ class Rainbow : public Scene {
 
 class Disco : public Scene {
     virtual bool run(uint16_t time, CRGBArray<NUM_LEDS>& leds) {
-        static const CRGB DiscoColors[] = {
-                CRGB::Red,
-                CRGB::Blue,
-                CRGB::Green,
-                CRGB::Purple,
-                CRGB::Yellow,
-                CRGB::Turquoise,
-                CRGB::Pink
-        };
+    	if((time % 100) == 0) {
+			static const CRGB DiscoColors[] = {
+					CRGB::Red,
+					CRGB::Blue,
+					CRGB::Green,
+					CRGB::Purple,
+					CRGB::Yellow,
+					CRGB::Turquoise,
+					CRGB::Pink
+			};
+			const int sets = 12;
+			for(int i = 0; i < sets; ++i) {
+				const int num = NUM_LEDS / sets;
+				leds(i*num,(i+1)*num-1).fill_solid(DiscoColors[random8(7)]);
+			}
+    	}
 
-        leds.fill_rainbow(millis()/10, 2);
-        FastLED.show(40);
-        return time < 30;
+		FastLED.show(40);
+
+        return time < 400;
     }
 };
 
@@ -137,12 +144,14 @@ int main() {
     ConstantColor green(CRGB::Green);
     ConstantColor purple(CRGB::Purple);
     Rainbow rb;
+    Disco d;
 
     scheduler.add(&blue);
     scheduler.add(&green);
     scheduler.add(&red);
     scheduler.add(&purple);
     scheduler.add(&rb);
+    scheduler.add(&d);
 
     for(;;) {
 #if 1
