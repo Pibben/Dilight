@@ -52,7 +52,7 @@ class Rainbow : public Scene {
 
 class Disco : public Scene {
     virtual bool run(uint16_t time, CRGBArray<NUM_LEDS>& leds) {
-    	if((time % 100) == 0) {
+    	if((time % 50) == 0) {
 			static const CRGB DiscoColors[] = {
 					CRGB::Red,
 					CRGB::Blue,
