@@ -146,7 +146,7 @@ void warmWhite(CRGBArray<NUM_LEDS>& leds) {
 
 bool getRemotePulse() {
     static uint8_t debounce = 0;
-    if(receive433MHz(0x00899381, 3) && debounce == 0) {
+    if(peek() && receive433MHz(0x00899381, 3) && debounce == 0) {
         debounce = 5;
         return true;
     } else {
