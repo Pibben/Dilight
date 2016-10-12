@@ -36,7 +36,7 @@ public:
     virtual bool run(uint16_t time, CRGBArray<NUM_LEDS>& leds) {
         leds.fill_solid(mColor);
         FastLED.show(40);
-        return time < 30;
+        return time < 400;
     }
 
     virtual ~ConstantColor() {}
@@ -46,7 +46,7 @@ class Rainbow : public Scene {
     virtual bool run(uint16_t time, CRGBArray<NUM_LEDS>& leds) {
         leds.fill_rainbow(millis()/10, 2);
         FastLED.show(40);
-        return time < 30;
+        return time < 400;
     }
 };
 
@@ -172,7 +172,7 @@ int main() {
             scheduler.run(leds);
         }
 
-        delay(100);
+        delay(10);
     }
 
     return 0;
