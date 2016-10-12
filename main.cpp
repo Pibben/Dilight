@@ -196,6 +196,7 @@ int main() {
 
     FastLED.addLeds<APA102, 11, 13, BGR>(leds, NUM_LEDS);
     FastLED.setCorrection(TypicalLEDStrip);
+    FastLED.setTemperature(Tungsten40W);
 
     blankFastLED(leds);
 
