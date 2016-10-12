@@ -44,7 +44,7 @@ public:
 
 class Rainbow : public Scene {
     virtual bool run(uint16_t time, CRGBArray<NUM_LEDS>& leds) {
-        leds.fill_rainbow(millis()/10, 2);
+        leds.fill_rainbow(millis() / 10, 2);
         FastLED.show(40);
         return time < 400;
     }
@@ -52,32 +52,30 @@ class Rainbow : public Scene {
 
 class Disco : public Scene {
     virtual bool run(uint16_t time, CRGBArray<NUM_LEDS>& leds) {
-    	if((time % 50) == 0) {
-			static const CRGB DiscoColors[] = {
-					CRGB::Red,
-					CRGB::Blue,
-					CRGB::Green,
-					CRGB::Purple,
-					CRGB::Yellow,
-					CRGB::Turquoise,
-					CRGB::Pink
-			};
-			const int sets = 12;
-			for(int i = 0; i < sets; ++i) {
-				const int num = NUM_LEDS / sets;
-				leds(i*num,(i+1)*num-1).fill_solid(DiscoColors[random8(7)]);
-			}
-    	}
+        if((time % 50) == 0) {
+            static const CRGB DiscoColors[] = { CRGB::Red,
+                    CRGB::Blue,
+                    CRGB::Green,
+                    CRGB::Purple,
+                    CRGB::Yellow,
+                    CRGB::Turquoise,
+                    CRGB::Pink };
+            const int sets = 12;
+            for(int i = 0; i < sets; ++i) {
+                const int num = NUM_LEDS / sets;
+                leds(i * num, (i + 1) * num - 1).fill_solid(DiscoColors[random8(7)]);
+            }
+        }
 
-		FastLED.show(40);
+        FastLED.show(40);
 
         return time < 400;
     }
 };
 
 void warmWhite(CRGBArray<NUM_LEDS>& leds) {
-	leds.fill_solid(CRGB::White);
-	FastLED.show();
+    leds.fill_solid(CRGB::White);
+    FastLED.show();
 }
 
 bool getRemotePulse() {
