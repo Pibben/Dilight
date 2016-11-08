@@ -59,10 +59,11 @@ static const CRGB DiscoColors[] = {
         CRGB::Purple,
         CRGB::Yellow,
         CRGB::Turquoise,
-        CRGB::Pink
+        CRGB::Pink,
+        CRGB::Orange
 };
 
-static const uint8_t numDiscoColors = 7;
+static const uint8_t numDiscoColors = 8;
 
 class Disco : public Scene {
     virtual bool run(uint16_t time, CRGBArray<NUM_LEDS>& leds) {
@@ -136,6 +137,57 @@ public:
         } else {
             return true;
         }
+    }
+};
+
+class Flow : public Scene {
+private:
+    uint16_t front;
+    bool inited;
+    CRGB color;
+
+    static CRGB fadeTo(const CRGB& from, const CRGB& to, uint8_t level) {
+        CRGB retval;
+
+        retval.r = (from.r * (255 - level) + to.r * level) / 256;
+        retval.g = (from.g * (255 - level) + to.g * level) / 256;
+        retval.b = (from.b * (255 - level) + to.b * level) / 256;
+
+        return retval;
+    }
+
+public:
+    Flow() : front(0), inited(false), color(CRGB::Black) {
+    }
+    virtual bool run(uint16_t time, CRGBArray<NUM_LEDS>& leds) {
+        if(!inited) {
+            leds.fill_solid(CRGB::Black);
+        }
+
+        front = (time * 5) % NUM_LEDS;
+
+        if((time % (NUM_LEDS / 5)) == 0) {
+            color = DiscoColors[random8(numDiscoColors)];
+        }
+
+        uint16_t i = front;
+
+        while(true) {
+            const uint8_t fade = max(0, i - front)*128/NUM_LEDS;
+            const uint8_t level = max(0, 255-fade);
+
+            leds[i % NUM_LEDS] = fadeTo(color, CRGB::Black, level);
+
+            i++;
+
+            if(i == front+NUM_LEDS) {
+                break;
+            }
+        }
+
+        FastLED.show(globalIntensity);
+
+        return time < NUM_LEDS;
     }
 };
 
@@ -218,14 +270,16 @@ int main() {
     Rainbow rb;
     Disco d;
     Fader f;
+    Flow w;
 
-    scheduler.add(&blue);
-    scheduler.add(&green);
-    scheduler.add(&red);
-    scheduler.add(&purple);
+    //scheduler.add(&blue);
+    //scheduler.add(&green);
+    //scheduler.add(&red);
+    //scheduler.add(&purple);
     scheduler.add(&rb);
     scheduler.add(&d);
     scheduler.add(&f);
+    scheduler.add(&w);
 
     for(;;) {
 #if 1
@@ -251,5 +305,4 @@ int main() {
 
     return 0;
 }
-
 
