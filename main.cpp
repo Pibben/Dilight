@@ -13,12 +13,12 @@
 
 #include <lib433mhz.h>
 
-#define NUM_LEDS 300
+#define NUM_LEDS (232)
 
 static const uint8_t globalIntensity = 40;
 
 static void blankFastLED(CRGBArray<NUM_LEDS>& leds) {
-    fill_solid(leds, 300, CRGB::Black);
+    fill_solid(leds, NUM_LEDS, CRGB::Black);
     FastLED.show();
 }
 
