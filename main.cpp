@@ -46,7 +46,7 @@ public:
 
 class Rainbow : public Scene {
     virtual bool run(uint16_t time, CRGBArray<NUM_LEDS>& leds) {
-        leds.fill_rainbow(millis() / 10, 2);
+        leds.fill_rainbow(millis() / 5, 2);
         FastLED.show(globalIntensity);
         return time < 400;
     }
