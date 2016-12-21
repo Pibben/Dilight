@@ -68,7 +68,7 @@ static const uint8_t numDiscoColors = 8;
 class Disco : public Scene {
     virtual bool run(uint16_t time, CRGBArray<NUM_LEDS>& leds) {
         if((time % 50) == 0) {
-            const int sets = 12;
+            const int sets = 8;
             for(int i = 0; i < sets; ++i) {
                 const int num = NUM_LEDS / sets;
                 leds(i * num, (i + 1) * num - 1).fill_solid(DiscoColors[random8(numDiscoColors)]);
