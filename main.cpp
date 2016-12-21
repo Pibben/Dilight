@@ -280,9 +280,9 @@ int main() {
     //scheduler.add(&red);
     //scheduler.add(&purple);
     scheduler.add(&rb);
-    scheduler.add(&d);
     scheduler.add(&f);
     scheduler.add(&w);
+    scheduler.add(&d);
 
     for(;;) {
 #if 1
