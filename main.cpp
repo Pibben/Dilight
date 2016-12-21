@@ -233,7 +233,10 @@ public:
     }
 
     void stop() {}
-    void start() {}
+    void start() {
+        currentScene = scenes;
+        time = 0;
+    }
 
     void add(Scene* scene) {
         if(scenes == nullptr) {
