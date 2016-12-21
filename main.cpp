@@ -15,7 +15,7 @@
 
 #define NUM_LEDS (232)
 
-static const uint8_t globalIntensity = 40;
+static const uint8_t globalIntensity = 255;
 
 static void blankFastLED(CRGBArray<NUM_LEDS>& leds) {
     fill_solid(leds, NUM_LEDS, CRGB::Black);
