@@ -144,7 +144,8 @@ class Flow : public Scene {
 private:
     uint16_t front;
     bool inited;
-    CRGB color;
+    CRGB oldColor;
+    CRGB newColor;
 
     static CRGB fadeTo(const CRGB& from, const CRGB& to, uint8_t level) {
         CRGB retval;
@@ -157,17 +158,19 @@ private:
     }
 
 public:
-    Flow() : front(0), inited(false), color(CRGB::Black) {
+    Flow() : front(0), inited(false), oldColor(CRGB::Black), newColor(CRGB::Black) {
     }
     virtual bool run(uint16_t time, CRGBArray<NUM_LEDS>& leds) {
+        static const uint8_t STEP = 5;
         if(!inited) {
             leds.fill_solid(CRGB::Black);
         }
 
-        front = (time * 5) % NUM_LEDS;
+        front = (time * STEP) % NUM_LEDS;
 
-        if((time % (NUM_LEDS / 5)) == 0) {
-            color = DiscoColors[random8(numDiscoColors)];
+        if(front >= 0 && front < STEP) {
+            oldColor = newColor;
+            newColor = DiscoColors[random8(numDiscoColors)];
         }
 
         uint16_t i = front;
@@ -176,7 +179,13 @@ public:
             const uint8_t fade = max(0, i - front)*128/NUM_LEDS;
             const uint8_t level = max(0, 255-fade);
 
-            leds[i % NUM_LEDS] = fadeTo(color, CRGB::Black, level);
+            uint16_t led = i % NUM_LEDS;
+
+            if(led < front) {
+                leds[led] = fadeTo(newColor, CRGB::Black, level);
+            } else {
+                leds[led] = fadeTo(oldColor, CRGB::Black, level);
+            }
 
             i++;
 
@@ -193,6 +202,11 @@ public:
 
 void warmWhite(CRGBArray<NUM_LEDS>& leds) {
     leds.fill_solid(CRGB::White);
+    FastLED.show(globalIntensity);
+}
+
+void blue(CRGBArray<NUM_LEDS>& leds) {
+    leds.fill_solid(CRGB::Blue);
     FastLED.show(globalIntensity);
 }
 
@@ -250,15 +264,21 @@ public:
     }
 };
 
+enum class Mode {
+    White,
+    Blue,
+    Disco
+};
+
 int main() {
-    bool discoMode = false;
+    Mode mode = Mode::White;
     CRGBArray<NUM_LEDS> leds;
 
     init();
 
     FastLED.addLeds<APA102, 11, 13, BGR>(leds, NUM_LEDS);
-    FastLED.setCorrection(TypicalLEDStrip);
-    FastLED.setTemperature(Tungsten40W);
+    FastLED.setCorrection(0xFFC04C);
+    //FastLED.setTemperature(Tungsten40W);
 
     blankFastLED(leds);
 
@@ -266,10 +286,10 @@ int main() {
 
     Scheduler scheduler;
 
-    ConstantColor blue(CRGB::Blue);
-    ConstantColor red(CRGB::Red);
-    ConstantColor green(CRGB::Green);
-    ConstantColor purple(CRGB::Purple);
+//    ConstantColor blue(CRGB::Blue);
+//    ConstantColor red(CRGB::Red);
+//    ConstantColor green(CRGB::Green);
+//    ConstantColor purple(CRGB::Purple);
     Rainbow rb;
     Disco d;
     Fader f;
@@ -285,21 +305,25 @@ int main() {
     scheduler.add(&d);
 
     for(;;) {
-#if 1
         if(getRemotePulse()) {
-            if(discoMode) {
+            switch(mode) {
+            case Mode::White:
+                mode = Mode::Blue;
+                blue(leds);
+                break;
+            case Mode::Blue:
+                mode = Mode::Disco;
+                scheduler.start();
+                break;
+            case Mode::Disco:
+                mode = Mode::White;
                 scheduler.stop();
                 warmWhite(leds);
-            } else {
-                scheduler.start();
+                break;
             }
-
-            discoMode = !discoMode;
         }
-#else
-        discoMode = true;
-#endif
-        if(discoMode) {
+
+        if(mode == Mode::Disco) {
             scheduler.run(leds);
         }
 
